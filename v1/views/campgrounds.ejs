@@ -1,9 +1,28 @@
-<h1>This is the cat campgrounds page!</h1>
+<% include partials/header %>
 
-<% campgrounds.forEach(function(campground) { %>
-    <div>
-        <h4><%= campground.name%></h4>
-        <img src="<%= campground.image%>">
+<div class="container">
+    <header class="jumbotron">
+        <div class="container">
+            <h1>Welcome to Cat Camp</h1>
+            <p>Here you will find all cute cat images selected by ... me!</p>
+            <p>
+                <a class="btn btn-primary btn-lg" href="/campgrounds/new">Add new cat campground</a>
+            </p>
+        </div>
+    </header>
+
+    <div class="row text-center" style="display:flex; flex-wrap: wrap;">
+        <% campgrounds.forEach(function(campground) { %>
+            <div class="col-md-3 col-sm-6">
+                <div class="thumbnail">
+                    <img src="<%= campground.image%>">
+                    <div class="caption">
+                        <h4><%= campground.name%></h4>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
     </div>
-        
-<% }); %>
+</div>
+
+<% include partials/footer %>
