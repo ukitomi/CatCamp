@@ -14,6 +14,8 @@ mongoose.connect("mongodb://localhost/catcamp");
 app.use(bodyParser.urlencoded({extended: true}));
 // tell express to see all files without extension as .ejs
 app.set("view engine", "ejs");
+// __dirname refers to the directory that this scrip is running
+app.use(express.static(__dirname + "/public"))
 
 // homepage, every localhost:3000 call will get to the homepage
 app.get("/", function(req, res) {
