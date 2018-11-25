@@ -3,6 +3,7 @@ var express     = require("express"),
     bodyParser  = require("body-parser"),
     mongoose    = require("mongoose"),
     Campground  = require("./models/campground"),
+    Comment     = require("./models/comment"),
     seedDB      = require("./seeds")
 
 seedDB();
@@ -27,7 +28,7 @@ app.get("/campgrounds", function(req, res){
             console.log("err");
         } else {
             // names we want to give it : data that we are passing in
-            res.render("index", {campgrounds: allCampgrounds});
+            res.render("campgrounds/index", {campgrounds: allCampgrounds});
         }
     });
 });
@@ -51,7 +52,7 @@ app.post("/campgrounds", function(req, res){
 
 // Create a new camground
 app.get("/campgrounds/new", function(req, res){
-    res.render("new");
+    res.render("campgrounds/new");
 });
 
 // SHOW - shows more info about one campground
@@ -63,11 +64,50 @@ app.get("/campgrounds/:id", function(req, res){
             console.log("err");
         } else {
             // render show template with that campground
-            res.render("show", {campground: foundCampground});
+            res.render("campgrounds/show", {campground: foundCampground});
         }
     });
 });
 
+// Comment routes
+app.get("/campgrounds/:id/comments/new", function(req, res) {
+    // find campground by id
+    // send that through when render
+    Campground.findById(req.params.id, function(err, campground) {
+        if (err) {
+            console.log("err");
+        }
+        else {
+            res.render("comments/new", {campground: campground});
+        }
+    })
+});
+
+app.post("/campgrounds/:id/comments", function(req, res) {
+    // loopup comment by id
+    Campground.findById(req.params.id, function(err, campground) {
+        if (err) {
+            console.log("err");
+            res.redirect("/campgrounds");
+        }
+        else {
+            // create new comment
+            Comment.create(req.body.comment, function(err, comment) {
+                if (err) {
+                    console.log("err");
+                }
+                else {
+                    // connect new comment to campground
+                    campground.comments.push(comment);
+                    campground.save();
+                    // redirect campground showpage
+                    res.redirect("/campgrounds/" + campground._id);
+                }
+            });
+        }
+    });
+
+});
 // start the server, tell it to listen on port 3000
 app.listen(3000, function() {
     console.log("server connected, go to localhost/3000");
