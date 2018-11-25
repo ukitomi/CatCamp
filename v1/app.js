@@ -11,17 +11,17 @@ app.use(bodyParser.urlencoded({extended: true}));
 // tell express to see all files without extension as .ejs
 app.set("view engine", "ejs");
 
-// SCHEMA SETUP
+// SCHEMA SETUP for the db table, in mongodb it's called a collection
 var campgroundSchema = new mongoose.Schema({
     name: String,
     image: String,
     description: String
 });
 
+// .model function makes a copy of the schema, and create an instance of the document Campground
 var Campground = mongoose.model("Campground", campgroundSchema);
 
-// 
-// an get request
+// homepage, every localhost:3000 call will get to the homepage
 app.get("/", function(req, res) {
     res.render("landing");
 });
@@ -56,6 +56,7 @@ app.post("/campgrounds", function(req, res){
     });
 });
 
+// Create a new camground
 app.get("/campgrounds/new", function(req, res){
     res.render("new");
 });
@@ -72,6 +73,7 @@ app.get("/campgrounds/:id", function(req, res){
         }
     });
 });
+
 // start the server, tell it to listen on port 3000
 app.listen(3000, function() {
     console.log("server connected, go to localhost/3000");
