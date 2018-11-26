@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 // __dirname refers to the directory that this scrip is running
 app.use(express.static(__dirname + "/public"))
-seedDB();
+// seedDB();  // seed the db   
 
 // PASSPORT config
 app.use(require("express-session")({
