@@ -7,7 +7,7 @@ var express     = require("express"),
     passport    = require("passport"),
     LocalStrategy = require("passport-local"),
     User        = require("./models/user"),
-    seedDB      = require("./seeds")
+    seedDB      = require("./seeds");
 
 // connect to mongodb
 mongoose.connect("mongodb://localhost/catcamp");
@@ -33,13 +33,22 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+app.use(function(req, res, next) {
+    // pass currentUser to every route
+    res.locals.currentUser = req.user;
+    // move on 
+    next();
+})
+
 // homepage, every localhost:3000 call will get to the homepage
 app.get("/", function(req, res) {
     res.render("landing");
 });
 
-// route to campground page, return all the cats
+// index page - return all cats
 app.get("/campgrounds", function(req, res){
+    // contain all user information of the currently login information
+    //req.user
     // Get all campgrounds from db 
     Campground.find({}, function(err, allCampgrounds) {
         if (err) {
@@ -88,7 +97,9 @@ app.get("/campgrounds/:id", function(req, res){
 });
 
 // Comment routes
-app.get("/campgrounds/:id/comments/new", function(req, res) {
+// when make a get request, app will check if the user is logged in first
+// if not log in, redirect 
+app.get("/campgrounds/:id/comments/new", isLoggedIn, function(req, res) {
     // find campground by id
     // send that through when render
     Campground.findById(req.params.id, function(err, campground) {
@@ -101,7 +112,7 @@ app.get("/campgrounds/:id/comments/new", function(req, res) {
     })
 });
 
-app.post("/campgrounds/:id/comments", function(req, res) {
+app.post("/campgrounds/:id/comments", isLoggedIn, function(req, res) {
     // loopup comment by id
     Campground.findById(req.params.id, function(err, campground) {
         if (err) {
@@ -145,7 +156,37 @@ app.post("/register", function(req, res) {
             res.redirect("/campgrounds");
         })
     });
-})
+});
+
+// show log in form
+app.get("/login", function(req, res) {
+    res.render("login");
+});
+
+// login route, handle login logic
+// have the middleware that handles callback
+// users are presume to exist already, different than how register handles
+app.post("/login", passport.authenticate("local", 
+    {
+        successRedirect: "/campgrounds", 
+        failureRedirect: "/login"
+    }), function(req, res) {
+});
+
+// log out route
+app.get("/logout",function(req, res) {
+    req.logout();
+    res.redirect("/campgrounds");
+});
+
+// check if user is logged in
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/login");
+}
+
 // start the server, tell it to listen on port 3000
 app.listen(3000, function() {
     console.log("server connected, go to localhost/3000");
