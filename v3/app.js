@@ -7,6 +7,7 @@ var express     = require("express"),
     passport    = require("passport"),
     LocalStrategy = require("passport-local"),
     User        = require("./models/user"),
+    methodOverride = require("method-override"),
     seedDB      = require("./seeds")
 
 var commentRoutes    = require("./routes/comments"),
@@ -21,6 +22,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 // __dirname refers to the directory that this scrip is running
 app.use(express.static(__dirname + "/public"))
+// convention to do _method
+app.use(methodOverride("_method"));
 // seedDB();  // seed the db   
 
 // PASSPORT config
