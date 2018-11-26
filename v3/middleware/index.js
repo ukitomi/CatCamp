@@ -7,7 +7,8 @@ var middlewareObj = {};
 middlewareObj.checkCampgroundOwnership = function(req, res, next) {
     if (req.isAuthenticated()) {
         Campground.findById(req.params.id, function(err, foundCampground) {
-            if (err) {
+            if (err || !foundCampground) {
+                req.flash("error", "Campground not found");
                 res.redirect("back");
             }
             else {
@@ -15,12 +16,14 @@ middlewareObj.checkCampgroundOwnership = function(req, res, next) {
                     next();
                 }
                 else {
+                    req.flash("error", "You don't have permission to do that");
                     res.redirect("back");
                 }
             }
         });
     }
     else {
+        req.flash("error", "You need to be logged in to do that");
         // goes back to previous page
         res.redirect("back")
     }
@@ -29,7 +32,8 @@ middlewareObj.checkCampgroundOwnership = function(req, res, next) {
 middlewareObj.checkCommentOwnership = function(req, res, next) {
     if (req.isAuthenticated()) {
         Campground.findById(req.params.comment_id, function(err, foundComment) {
-            if (err) {
+            if (err || !foundComment) {
+                res.flash("error", "Comment not found");
                 res.redirect("back");
             }
             else {
@@ -37,12 +41,14 @@ middlewareObj.checkCommentOwnership = function(req, res, next) {
                     next();
                 }
                 else {
+                    req.flash("error", "You don't have permission to do that");
                     res.redirect("back");
                 }
             }
         });
     }
     else {
+        req.flash("error", "You need to be logged in to do that");
         // goes back to previous page
         res.redirect("back")
     }
@@ -53,6 +59,7 @@ middlewareObj.isLoggedIn = function(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
+    req.flash("error", "Please Login First");
     res.redirect("/login");
 }
 module.exports = middlewareObj;
