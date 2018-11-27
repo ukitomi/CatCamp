@@ -15,7 +15,9 @@ var commentRoutes    = require("./routes/comments"),
     campgroundRoutes = require("./routes/campgrounds"),
     authRoutes       = require("./routes/index")
 // connect to mongodb
-mongoose.connect("mongodb://localhost/catcamp");
+var url = process.env.DATABASEURL || "mongodb://localhost/catcamp";
+mongoose.connect(url);
+// mongodb://ukiitomi:159951cc@ds149495.mlab.com:49495/catcamp
 
 // convention, tell it to recognize all the '/' extensions
 app.use(bodyParser.urlencoded({extended: true}));
@@ -55,6 +57,6 @@ app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
 
 // start the server, tell it to listen on port 3000
-app.listen(3000, function() {
+app.listen(process.env.PORT, process.env.IP, function() {
     console.log("server connected, go to localhost/3000");
 });
